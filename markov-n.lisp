@@ -33,10 +33,8 @@
       	 	   (if (not (gethash next (gethash key *table*)))
 		       (setf (gethash next (gethash key *table*)) 1)
 		       (incf (gethash next (gethash key *table*)))))
-      	       (when (zerop (mod i counter-step)) (format t ".")))))))
-
-(defun wav-file (stream)
-  (loop :for char :across "RIFF" :do (print (char-code char))))
+      	       (when (zerop (mod i counter-step))
+		 (progn (format t ".") (finish-output))))))))
 
 (defun get-next (current)
   (let* ((hash-size (hash-table-count (gethash current *table*)))
@@ -65,7 +63,8 @@
 				     (get-next (combine-bytes (subseq r (- i n))))
 				     (elt initial-list i))
 		       :collect c :into r
-		       :do (when (zerop (ceiling (mod i (/ size 100)))) (format t "."))
+		       :do (when (zerop (ceiling (mod i (/ size 100))))
+			     (progn (format t ".") (finish-output))
 		       :finally (return r))
 		    out)))
 
