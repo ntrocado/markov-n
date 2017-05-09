@@ -64,7 +64,7 @@
 				     (elt initial-list i))
 		       :collect c :into r
 		       :do (when (zerop (ceiling (mod i (/ size 100))))
-			     (progn (format t ".") (finish-output))
+			     (progn (format t ".") (finish-output)))
 		       :finally (return r))
 		    out)))
 
