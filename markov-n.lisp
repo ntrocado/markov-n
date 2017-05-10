@@ -76,3 +76,19 @@
       (read-sequence first-bytes file))    
     (write-file "output.pcm" *order* 150000 first-bytes))
   (values))
+
+;; (mapcar #'sb-thread:join-thread
+;; 	(list
+;; 	 (sb-thread:make-thread (lambda ()
+;; 				  (let ((first-bytes (make-sequence 'list (1+ *order*))))
+;; 				    (with-open-file (file "input.pcm" :direction :input :element-type '(signed-byte 16))
+;; 				      (read-sequence first-bytes file))    
+;; 				    (write-file "output1.pcm" *order* 150000 first-bytes)))
+;; 				:name t1)
+;; 	 (sb-thread:make-thread (lambda ()
+;; 				  (let ((first-bytes (make-sequence 'list (1+ *order*))))
+;; 				    (with-open-file (file "input.pcm" :direction :input :element-type '(signed-byte 16))
+;; 				      (read-sequence first-bytes file))    
+;; 				    (write-file "output2.pcm" *order* 150000 first-bytes)))
+;; 				:name t2)))
+
