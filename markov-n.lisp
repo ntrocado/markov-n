@@ -2,7 +2,6 @@
 
 (defparameter *table* (make-hash-table))
 (defparameter *rand* 0)
-(defparameter *order* 5)
 
 (defun combine-bytes (bytes)
   (loop :for n :downfrom (1- (length bytes))
@@ -59,23 +58,23 @@
     (format t "~a~%" (make-string 100 :initial-element #\_))
     (write-sequence (loop
 		       :for i :upto size
-		       :for c := (if (> (the fixnum i) (the fixnum n))
-				     (get-next (combine-bytes (subseq r (- i n))))
-				     (elt initial-list i))
-		       :collect c :into r
+		       :collect (if (> (the fixnum i) (the fixnum n))
+				    (get-next (combine-bytes (subseq r (- i n))))
+				    (elt initial-list i))
+		       :into r
 		       :do (when (zerop (ceiling (mod i (/ size 100))))
 			     (progn (format t ".") (finish-output)))
 		       :finally (return r))
 		    out)))
 
-(defun main (input output size)
+(defun main (order input output size)
   "Analyses <input> file and creates a new <output> file with <size> bytes."
-  (read-file input *order*)
+  (read-file input order)
   (format t "~%Creating new file...~%")
-  (let ((first-bytes (make-sequence 'list (1+ *order*))))
+  (let ((first-bytes (make-sequence 'list (1+ order))))
     (with-open-file (file input :direction :input :element-type '(signed-byte 16))
       (read-sequence first-bytes file))    
-    (write-file output *order* size first-bytes))
+    (write-file output order size first-bytes))
   (values))
 
 
