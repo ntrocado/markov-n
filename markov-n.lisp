@@ -55,17 +55,16 @@
 		   :direction :output
 		   :element-type '(signed-byte 16)
 		   :if-exists :supersede)
-    (format t "~a~%" (make-string 100 :initial-element #\_))
-    (write-sequence (loop
-		       :for i :upto size
-		       :collect (if (> (the fixnum i) (the fixnum n))
-				    (get-next (combine-bytes (subseq r (- i n))))
-				    (elt initial-list i))
-		       :into r
-		       :do (when (zerop (ceiling (mod i (/ size 100))))
-			     (progn (format t ".") (finish-output)))
-		       :finally (return r))
-		    out)))
+    (let ((buffer (subseq initial-list 0 (1- n))))
+      (format t "~a~%" (make-string 100 :initial-element #\_))
+      (dotimes (i size t)
+	(let ((new-byte (if (> (the fixnum i) (the fixnum n))
+			    (get-next (combine-bytes buffer))
+			    (elt initial-list i))))
+	  (write-byte new-byte out)
+	  (setf buffer (rest (nconc buffer (list new-byte))))
+	  (when (zerop (ceiling (mod i (/ size 100))))
+	    (progn (format t ".") (finish-output))))))))
 
 (defun main (order input output size)
   "Analyses <input> file and creates a new <output> file with <size> bytes."
