@@ -55,7 +55,7 @@
 		   :direction :output
 		   :element-type '(signed-byte 16)
 		   :if-exists :supersede)
-    (let ((buffer (subseq initial-list 0 (1- n))))
+    (let ((buffer (subseq initial-list 0 n)))
       (format t "~a~%" (make-string 100 :initial-element #\_))
       (dotimes (i size t)
 	(let ((new-byte (if (> (the fixnum i) (the fixnum n))
