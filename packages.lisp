@@ -5,4 +5,5 @@
   (:export :make-discrete-random-var))
 
 (defpackage :markov-n
-  (:use :common-lisp :alexandria :alias-method))
+  (:use :common-lisp :alexandria :alias-method)
+  (:export :main))
