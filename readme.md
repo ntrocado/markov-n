@@ -12,7 +12,7 @@ and run:
 ```common lisp
 (markov-n:main <order> <input file> <output file> <size>)
 ```
-where `order` is the number of previous states considered in the transition matrix, `input file` and `output file` are headless signed 16-bit PCM audio file paths and `size` is the intended size of the output file, in bytes.
+where `order` is the number of previous states considered in the transition matrix, `input file` and `output file` are paths to header-less signed 16-bit PCM audio files, and `size` is the intended size of the output file, in bytes.
 
 ## Author
 

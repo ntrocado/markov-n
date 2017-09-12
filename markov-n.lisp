@@ -73,7 +73,6 @@
   (let ((first-bytes (make-sequence 'list (1+ order))))
     (with-open-file (file input :direction :input :element-type '(signed-byte 16))
       (read-sequence first-bytes file))    
-    (write-file output order size first-bytes))
-  (values))
+    (write-file output order size first-bytes)))
 
 
