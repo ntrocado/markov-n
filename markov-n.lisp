@@ -5,35 +5,36 @@
 
 (defun combine-bytes (bytes)
   (loop :for n :downfrom (1- (length bytes))
-     :for b :in bytes
-     :summing (* b (expt 65536 n))))
-  
+	:for b :in bytes
+	:summing (* b (expt 256 n))))
+
+(defun get-chunk (file)
+  (loop :for n :in (wav:read-wav-file file)
+	:when (equalp (getf n :chunk-id) "data")
+	  :return (getf n :chunk-data)))
+
 (defun read-file (file n)
-  (with-open-file (data
-		   file
-		   :direction :input
-		   :element-type '(signed-byte 16))
-    (let* ((data-seq (make-sequence 'list (file-length data)))
-	   (data-length (length data-seq)))
-      (read-sequence data-seq data)
-      (format t "File read. Size is ~a samples.~%" data-length)
-      (format t "~a~%" (make-string 100 :initial-element #\_))
-      (nconc data-seq (subseq data-seq 0 n))
-      (loop :with counter-step := (ceiling (/ data-length 100))
-      	 :for next :in (subseq data-seq n)
-      	 :for i :from n
-      	 :for subseq-start := (- i n)
-      	 :do (let* ((data-subseq (subseq data-seq subseq-start i))
-      	 	    (key (combine-bytes data-subseq)))
-      	       (if (not (hash-table-p (gethash key *table*)))
-      		   (progn
-      		     (setf (gethash key *table*) (make-hash-table))
-      		     (setf (gethash next (gethash key *table*)) 1))
-      	 	   (if (not (gethash next (gethash key *table*)))
-		       (setf (gethash next (gethash key *table*)) 1)
-		       (incf (gethash next (gethash key *table*)))))
-      	       (when (zerop (mod i counter-step))
-		 (progn (format t ".") (finish-output))))))))
+  (let* ((data (get-chunk file))
+	 (first-bytes (subseq data 0 n))
+	 (data-seq (concatenate 'vector first-bytes data))
+	 (data-length (length data-seq)))
+    (format t "File read. Size is ~a samples.~%" data-length)
+    (format t "~a~%" (make-string 100 :initial-element #\_))
+    (loop :with counter-step := (ceiling (/ data-length 100))
+	  :for next :across (subseq data-seq n)
+	  :for i :from n
+	  :for subseq-start := (- i n)
+	  :do (let* ((data-subseq (subseq data-seq subseq-start i))
+		     (key (combine-bytes (coerce data-subseq 'list))))
+		(if (not (hash-table-p (gethash key *table*)))
+		    (progn
+		      (setf (gethash key *table*) (make-hash-table))
+		      (setf (gethash next (gethash key *table*)) 1))
+		    (if (not (gethash next (gethash key *table*)))
+			(setf (gethash next (gethash key *table*)) 1)
+			(incf (gethash next (gethash key *table*)))))
+		(when (zerop (mod i counter-step))
+		  (progn (format t ".") (finish-output)))))))
 
 (defun get-next (current)
   (let* ((hash-size (hash-table-count (gethash current *table*)))
@@ -53,7 +54,7 @@
   (with-open-file (out
 		   file
 		   :direction :output
-		   :element-type '(signed-byte 16)
+		   :element-type '(unsigned-byte 8)
 		   :if-exists :supersede)
     (let ((buffer (subseq initial-list 0 n)))
       (format t "~a~%" (make-string 100 :initial-element #\_))
@@ -70,9 +71,7 @@
   "Analyses <input> file and creates a new <output> file with <size> bytes."
   (read-file input order)
   (format t "~%Creating new file...~%")
-  (let ((first-bytes (make-sequence 'list (1+ order))))
-    (with-open-file (file input :direction :input :element-type '(signed-byte 16))
-      (read-sequence first-bytes file))    
+  (let ((first-bytes (coerce (subseq (get-chunk input) 0 (1+ order)) 'list)))
     (write-file output order size first-bytes)))
 
 

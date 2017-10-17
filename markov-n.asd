@@ -2,7 +2,7 @@
   :description "Markov chains on sample level with pcm audio files."
   :version "1"
   :author "Nuno Trocado"
-  :depends-on ("alexandria")
+  :depends-on ("alexandria" "cl-wav")
   :components ((:file "packages")
                (:file "alias-method" :depends-on ("packages"))
                (:file "markov-n" :depends-on ("alias-method"))))
