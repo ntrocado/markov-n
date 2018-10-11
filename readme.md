@@ -1,3 +1,8 @@
+# [DEPRECATED]
+
+_This project is not going to be maintained or developed further. Use [cl-markov-chains](https://github.com/ntrocado/cl-markov-chains "Markov chains in Common Lisp") instead, which offers the same basic functionality, and e.g. [cl-wave](https://github.com/RyanTKing/cl-wave) if you need to read/write .wav files._
+
+
 # markov-n
 
 *n*th order Markov chains on sample level.
